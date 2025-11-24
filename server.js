@@ -83,7 +83,7 @@ function createGoblin(x, y) {
         isSlowed: false,
         slowPercent: 0,
         isStunned: false,
-        respawnTime: 30000 // 30 seconds
+        respawnTime: 3000 // 3 seconds
     };
 }
 
@@ -109,7 +109,7 @@ function createOrc(x, y) {
         isSlowed: false,
         slowPercent: 0,
         isStunned: false,
-        respawnTime: 45000
+        respawnTime: 3000
     };
 }
 
@@ -217,7 +217,23 @@ io.on('connection', (socket) => {
                 ability: data.ability,
                 targetX: data.targetX,
                 targetY: data.targetY,
-                direction: data.direction
+                direction: data.direction,
+                playerX: data.playerX,
+                playerY: data.playerY
+            });
+        }
+    });
+    
+    // Handle status effect application to other players
+    socket.on('applyStatus', (data) => {
+        const targetPlayer = players.get(data.targetId);
+        if (targetPlayer) {
+            // Broadcast status effect to target
+            io.to(data.targetId).emit('statusApplied', {
+                effect: data.effect,
+                value: data.value,
+                duration: data.duration,
+                attackerId: socket.id
             });
         }
     });
